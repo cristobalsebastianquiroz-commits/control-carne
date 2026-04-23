@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Control Carne" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/style.css" />
+  <title>Control de Carne</title>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       PANTALLA: LOGIN
+  ══════════════════════════════════════ -->
+  <div id="screen-login" class="screen active">
+    <div class="screen-inner">
+      <div class="app-brand">
+        <div class="brand-icon">🥩</div>
+        <h1 class="brand-title">CONTROL<br>CARNE</h1>
+        <p class="brand-sub">Sistema de ciclos de producción</p>
+      </div>
+      <div class="form-block">
+        <label class="field-label">OPERADOR</label>
+        <input
+          type="text"
+          id="input-usuario"
+          class="input-big"
+          placeholder="Tu nombre"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="words"
+        />
+        <button class="btn-primary" id="btn-login" onclick="login()">
+          INGRESAR
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PANTALLA: BODEGA (KG INGRESADOS)
+  ══════════════════════════════════════ -->
+  <div id="screen-bodega" class="screen">
+    <div class="screen-inner">
+      <div class="screen-header">
+        <div class="step-badge">PASO 1 / 3</div>
+        <h2 class="screen-title">BODEGA</h2>
+        <p class="screen-sub">¿Cuántos kilos entran hoy?</p>
+      </div>
+
+      <div class="operator-bar">
+        <span class="operator-label">👤</span>
+        <span id="display-usuario" class="operator-name">—</span>
+        <button class="btn-logout" onclick="logout()">CAMBIAR</button>
+      </div>
+
+      <div class="form-block">
+        <label class="field-label">KG INGRESADOS</label>
+        <div class="input-wrapper">
+          <input
+            type="number"
+            id="input-kg-ingreso"
+            class="input-big input-number"
+            placeholder="0.0"
+            min="0.1"
+            step="0.1"
+            inputmode="decimal"
+          />
+          <span class="input-unit">kg</span>
+        </div>
+      </div>
+
+      <button class="btn-primary btn-go" id="btn-iniciar" onclick="iniciarProceso()">
+        INICIAR PROCESO →
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PANTALLA: COCINA
+  ══════════════════════════════════════ -->
+  <div id="screen-cocina" class="screen">
+    <div class="screen-inner">
+      <div class="screen-header">
+        <div class="step-badge">PASO 2 / 3</div>
+        <h2 class="screen-title">COCINA</h2>
+        <p class="screen-sub">Ingresa los resultados del proceso</p>
+      </div>
+
+      <div class="info-pill">
+        <span class="info-pill-label">INGRESO:</span>
+        <span id="display-kg-ingreso" class="info-pill-value">— kg</span>
+      </div>
+
+      <div class="form-block">
+        <label class="field-label">KG ÚTILES</label>
+        <div class="input-wrapper">
+          <input
+            type="number"
+            id="input-kg-util"
+            class="input-big input-number"
+            placeholder="0.0"
+            min="0"
+            step="0.1"
+            inputmode="decimal"
+            oninput="actualizarResumenCocina()"
+          />
+          <span class="input-unit">kg</span>
+        </div>
+      </div>
+
+      <div class="form-block">
+        <label class="field-label">KG MERMA</label>
+        <div class="input-wrapper">
+          <input
+            type="number"
+            id="input-merma"
+            class="input-big input-number"
+            placeholder="0.0"
+            min="0"
+            step="0.1"
+            inputmode="decimal"
+            oninput="actualizarResumenCocina()"
+          />
+          <span class="input-unit">kg</span>
+        </div>
+      </div>
+
+      <div class="form-block">
+        <label class="field-label">N° BOLSAS</label>
+        <div class="input-wrapper">
+          <input
+            type="number"
+            id="input-bolsas"
+            class="input-big input-number"
+            placeholder="0"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            oninput="actualizarResumenCocina()"
+          />
+          <span class="input-unit">un</span>
+        </div>
+      </div>
+
+      <!-- Mini preview en tiempo real -->
+      <div id="cocina-preview" class="preview-bar hidden">
+        <div class="preview-item">
+          <span class="preview-val" id="prev-total">—</span>
+          <span class="preview-lbl">kg total</span>
+        </div>
+        <div class="preview-sep">|</div>
+        <div class="preview-item">
+          <span class="preview-val" id="prev-diff" >—</span>
+          <span class="preview-lbl">diferencia</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="volverBodega()">← ATRÁS</button>
+        <button class="btn-primary" id="btn-finalizar" onclick="finalizarCiclo()">FINALIZAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PANTALLA: RESULTADO
+  ══════════════════════════════════════ -->
+  <div id="screen-resultado" class="screen">
+    <div class="screen-inner">
+      <div class="screen-header">
+        <div class="step-badge">RESULTADO</div>
+        <h2 class="screen-title" id="result-estado-titulo">CUADRA</h2>
+      </div>
+
+      <div id="result-estado-card" class="estado-card estado-ok">
+        <div class="estado-icon" id="result-icon">✓</div>
+        <div class="estado-msg" id="result-msg">Ciclo correcto</div>
+        <div class="estado-diff" id="result-diff"></div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-val" id="res-cortes">—</div>
+          <div class="stat-lbl">CORTES TOTALES</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="res-peso-prom">—</div>
+          <div class="stat-lbl">KG / BOLSA</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="res-merma-pct">—</div>
+          <div class="stat-lbl">% MERMA</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="res-kg-ingreso">—</div>
+          <div class="stat-lbl">KG INGRESO</div>
+        </div>
+      </div>
+
+      <!-- Estado sincronización -->
+      <div id="sync-status" class="sync-bar sync-pending">
+        <span id="sync-icon">⏳</span>
+        <span id="sync-text">Guardando...</span>
+      </div>
+
+      <button class="btn-primary btn-go" onclick="nuevoCiclo()">
+        NUEVO CICLO +
+      </button>
+
+      <button class="btn-ghost" onclick="mostrarDashboard()">
+        Ver dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PANTALLA: DASHBOARD
+  ══════════════════════════════════════ -->
+  <div id="screen-dashboard" class="screen">
+    <div class="screen-inner">
+      <div class="screen-header">
+        <h2 class="screen-title">DASHBOARD</h2>
+        <p class="screen-sub" id="dash-fecha">Hoy</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-val" id="dash-kg">—</div>
+          <div class="stat-lbl">KG PROCESADOS</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="dash-merma-pct">—</div>
+          <div class="stat-lbl">% MERMA PROM.</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="dash-cortes">—</div>
+          <div class="stat-lbl">CORTES TOTALES</div>
+        </div>
+        <div class="stat-box stat-box-alert" id="dash-errores-box">
+          <div class="stat-val" id="dash-errores">—</div>
+          <div class="stat-lbl">CICLOS CON ERROR</div>
+        </div>
+      </div>
+
+      <div class="ciclos-list" id="ciclos-list">
+        <div class="ciclo-empty">Cargando ciclos...</div>
+      </div>
+
+      <!-- Tolerancia configurable -->
+      <div class="config-block">
+        <label class="field-label">TOLERANCIA (kg)</label>
+        <div class="input-wrapper">
+          <input
+            type="number"
+            id="input-tolerancia"
+            class="input-medium input-number"
+            value="0.5"
+            min="0.1"
+            step="0.1"
+            inputmode="decimal"
+            onchange="guardarTolerancia(this.value)"
+          />
+          <span class="input-unit">kg</span>
+        </div>
+      </div>
+
+      <button class="btn-secondary" onclick="volverDeDashboard()">
+        ← VOLVER
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TOAST / NOTIFICACIÓN
+  ══════════════════════════════════════ -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Firebase SDK -->
+  <script type="module" src="js/firebase.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('SW registrado:', reg.scope))
+          .catch(err => console.warn('SW error:', err));
+      });
+    }
+  </script>
+</body>
+</html>
