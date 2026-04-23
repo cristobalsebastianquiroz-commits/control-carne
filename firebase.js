@@ -23,12 +23,21 @@ import {
 //  ⚠️  REEMPLAZA ESTOS VALORES CON LOS TUYOS
 // ──────────────────────────────────────────
 const firebaseConfig = {
-  apiKey:            "TU_API_KEY",
-  authDomain:        "TU_PROJECT_ID.firebaseapp.com",
-  projectId:         "TU_PROJECT_ID",
-  storageBucket:     "TU_PROJECT_ID.appspot.com",
-  messagingSenderId: "TU_SENDER_ID",
-  appId:             "TU_APP_ID"
+
+  apiKey: "AIzaSyADLCzoVrAAjlDWeYCe9pbb7Inpqcz2Xhc",
+
+  authDomain: "control-carne-buffet.firebaseapp.com",
+
+  projectId: "control-carne-buffet",
+
+  storageBucket: "control-carne-buffet.firebasestorage.app",
+
+  messagingSenderId: "201929025702",
+
+  appId: "1:201929025702:web:2d9a15166f0b5b9492ac67",
+
+  measurementId: "G-PW4S7DPZV9"
+
 };
 
 let db = null;
